@@ -25,7 +25,19 @@ object Main {
   /**
    * Exercise 2
    */
-  def balance(chars: List[Char]): Boolean = ???
+  def innerBalance(n: Int, chars: List[Char]): Int = {
+    if (chars.isEmpty) 0
+    else if (n < 0) -1
+    else if (chars.head == '(') innerBalance(n + 1, chars.tail) + 1
+    else if (chars.head == ')') innerBalance(n - 1, chars.tail) - 1
+    else innerBalance(n, chars.tail)
+  }
+
+  def balance(chars: List[Char]): Boolean = {
+    if (innerBalance(0, chars) == 0)  true
+    else false
+  }
+
 
   /**
    * Exercise 3
