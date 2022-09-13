@@ -1,6 +1,8 @@
+*/**/*/
+*/**/*
+
+!*/**/src/
+!*/**/src/**
+
 .DS_Store
 */**/DS_Store
-
-*/**/project/
-*/**/.bsp/
-*/**/target/
