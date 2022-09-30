@@ -159,11 +159,11 @@ object Huffman {
    */
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
     def decodeAcc(treeAcc: CodeTree, bits: List[Bit], acc: List[Char]): List[Char] = {
-      tree match {
+      treeAcc match {
         case Leaf(char, _) => {
           bits match {
             case Nil => acc:::(char::Nil)
-            case head::tail => decodeAcc(tree, tail, acc:::(char::Nil))
+            case head::tail => decodeAcc(tree, bits, acc:::(char::Nil))
           }
         }
         case Fork(left, right, chars, _) => {
@@ -193,7 +193,7 @@ object Huffman {
   /**
    * Write a function that returns the decoded secret
    */
-  def decodedSecret: List[Char] = ???
+  def decodedSecret: List[Char] = decode(frenchCode, secret)
 
 
 
