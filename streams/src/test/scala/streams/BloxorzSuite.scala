@@ -64,4 +64,20 @@ class BloxorzSuite extends FunSuite {
       assert(solution.length == optsolution.length)
     }
   }
+
+  test("avoiding circular") {
+    new Level1 {
+      val newNeighbor = newNeighborsOnly(
+        Set(
+          (Block(Pos(1,2),Pos(1,3)), List(Right,Left,Up)),
+          (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
+        ).toStream,
+        Set(Block(Pos(1,2),Pos(1,3)), Block(Pos(1,1),Pos(1,1)))
+      )
+      val result = Set(
+        (Block(Pos(2,1),Pos(3,1)), List(Down,Left,Up))
+      ).toStream
+      assert(newNeighbor == result)
+    }
+  }
 }
