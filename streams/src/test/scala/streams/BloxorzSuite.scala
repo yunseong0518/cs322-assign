@@ -65,7 +65,7 @@ class BloxorzSuite extends FunSuite {
     }
   }
 
-  test("avoiding circular") {
+  test("avoiding circular for level 1") {
     new Level1 {
       val newNeighbor = newNeighborsOnly(
         Set(
