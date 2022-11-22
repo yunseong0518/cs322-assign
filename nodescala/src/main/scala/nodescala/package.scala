@@ -18,7 +18,7 @@ package object nodescala {
     /** Returns a future that is always completed with `value`.
      */
     def always[T](value: T): Future[T] = {
-      val promise = Promise[T]()
+      val promise = Promise[T]
       promise.success(value)
       promise.future
     }
@@ -27,7 +27,7 @@ package object nodescala {
      *  This future may be useful when testing if timeout logic works correctly.
      */
     def never[T]: Future[T] = {
-      val promise = Promise[T]()
+      val promise = Promise[T]
       promise.future
     }
     /** Given a list of futures `fs`, returns the future holding the list of values of all the futures from `fs`.
@@ -35,7 +35,9 @@ package object nodescala {
      *  The values in the list are in the same order as corresponding futures `fs`.
      *  If any of the futures `fs` fails, the resulting future also fails.
      */
-    def all[T](fs: List[Future[T]]): Future[List[T]] = ???
+    def all[T](fs: List[Future[T]]): Future[List[T]] = {
+      Future.sequence(fs)
+    }
     /** Given a list of futures `fs`, returns the future holding the value of the future from `fs` that completed first.
      *  If the first completing future in `fs` fails, then the result is failed as well.
      *
@@ -45,7 +47,16 @@ package object nodescala {
      *
      *  may return a `Future` succeeded with `1`, `2` or failed with an `Exception`.
      */
-    def any[T](fs: List[Future[T]]): Future[T] = ???
+    def any[T](fs: List[Future[T]]): Future[T] = {
+      val promise = Promise[T]
+      fs.foreach(future => {
+        future onComplete {
+          case Success(value) => promise.success(value)
+          case Failure(e) => promise.failure(e)
+        }
+      })
+      promise.future
+    }
 
     /** Returns a future with a unit value that is completed after time `t`.
      */
