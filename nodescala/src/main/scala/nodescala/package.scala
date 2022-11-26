@@ -51,8 +51,10 @@ package object nodescala {
       val promise = Promise[T]
       fs.foreach(future => {
         future onComplete {
-          case Success(value) => promise.success(value)
-          case Failure(e) => promise.failure(e)
+          case Success(value) => {
+            promise.trySuccess(value)
+          }
+          case Failure(e) => promise.tryFailure(e)
         }
       })
       promise.future
@@ -62,7 +64,11 @@ package object nodescala {
      */
     def delay(t: Duration): Future[Unit] = {
       val promise = Promise[Unit]
-      Await.ready(promise.future, t)
+      try {
+        Await.ready(never[Unit], t)
+      } catch {
+        case _: Throwable => promise.success((): Unit)
+      }
       promise.future
     }
 
@@ -104,15 +110,27 @@ package object nodescala {
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continueWith[S](cont: Future[T] => S): Future[S] = Future{cont(f)}
-
+    def continueWith[S](cont: Future[T] => S): Future[S] = {
+      val promise = Promise[S]
+      f onComplete {
+        _ => promise.success(cont(f))
+      }
+      promise.future
+    }
+    
     /** Continues the computation of this future by taking the result
      *  of the current future and mapping it into another future.
      *
      *  The function `cont` is called only after the current future completes.
      *  The resulting future contains a value returned by `cont`.
      */
-    def continue[S](cont: Try[T] => S): Future[S] = Future{cont(f.value.get)}
+    def continue[S](cont: Try[T] => S): Future[S] = {
+      val promise = Promise[S]
+      f onComplete {
+        value => promise.success(cont(value))
+      }
+      promise.future
+    }
 
   }
 
